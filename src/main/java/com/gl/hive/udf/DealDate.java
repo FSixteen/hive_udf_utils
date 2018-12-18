@@ -6,7 +6,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 
-public class SBC2DBC extends GenericUDF {
+public class DealDate extends GenericUDF {
 
   @Override
   public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
@@ -15,20 +15,23 @@ public class SBC2DBC extends GenericUDF {
 
   @Override
   public Object evaluate(DeferredObject[] arguments) throws HiveException {
-    if (null == arguments || null == arguments[0] || null == arguments[0].get()) return null;
-    String id = arguments[0].get().toString();
-    StringBuilder result = new StringBuilder(id.length());
-    for (int i = 0; i < id.length(); i++) {
-      char c = id.charAt(i);
-      if (65281 <= c && c <= 65374) result.append((char) (c - 65248));
-      else result.append(c);
+    try {
+      if (null == arguments || null == arguments[0] || null == arguments[0].get()) return null;
+      String date = arguments[0].get().toString();
+      if (19 == date.trim().length()) return date.trim();
+      else if (16 == date.trim().length()) return date.trim() + ":00";
+      else if (10 == date.trim().length()) return date.trim() + " 00:00:00";
+      else if (8 == date.trim().length())
+        return date.trim().substring(0, 4) + "-" + date.trim().substring(4, 6) + "-" + date.trim().substring(6, 8) + " 00:00:00";
+      else return date;
+    } catch (Exception e) {
+      return null;
     }
-    return result.toString();
   }
 
   @Override
   public String getDisplayString(String[] children) { // 显示函数的帮助信息
-    return "全角转半角!";
+    return "时间转换(yyyy-MM-dd HH:mm:ss)!";
   }
 
 }

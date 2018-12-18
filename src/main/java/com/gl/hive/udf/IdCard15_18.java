@@ -1,12 +1,10 @@
 package com.gl.hive.udf;
 
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
-import org.apache.hadoop.hive.ql.exec.UDFArgumentLengthException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.StringObjectInspector;
 
 public class IdCard15_18 extends GenericUDF {
 
@@ -15,13 +13,12 @@ public class IdCard15_18 extends GenericUDF {
 
   @Override
   public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
-    if (arguments.length != 1) throw new UDFArgumentLengthException("仅支持一个参数: String arg");
-    if (!(arguments[0] instanceof StringObjectInspector)) throw new UDFArgumentLengthException("仅支持一个参数: String arg");
     return PrimitiveObjectInspectorFactory.javaStringObjectInspector;
   }
 
   @Override
   public Object evaluate(DeferredObject[] arguments) throws HiveException {
+    if (null == arguments || null == arguments[0] || null == arguments[0].get()) return null;
     StringBuilder result = new StringBuilder(arguments[0].get().toString());
     if (18 == result.length()) return result.toString();
     result.insert(6, "19");
